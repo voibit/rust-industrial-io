@@ -349,6 +349,28 @@ impl Buffer {
             }
         }
     }
+
+    /// Gets a slice into the buffer
+    pub fn slice<'a>(&self) -> Result<&'a[u8]>
+    {
+        unsafe {
+            let start  = ffi::iio_buffer_start(self.buf)  as *const u8;
+            let end  = ffi::iio_buffer_end( self.buf)   as *const u8;
+            let length = end.offset_from(start) as usize;
+            Ok (slice::from_raw_parts(start, length))
+        }
+    }
+
+    /// Gets a mutable slice into the buffer
+    pub fn slice_mut<'a>(&self) -> Result<&'a mut [u8]>
+    {
+        unsafe {
+            let start  = ffi::iio_buffer_start(self.buf)  as  *mut u8;
+            let end  = ffi::iio_buffer_end( self.buf)   as *const u8;
+            let length = end.offset_from(start) as usize;
+            Ok (slice::from_raw_parts_mut(start, length))
+        }
+    }
 }
 
 /// Destroy the underlying buffer when the object scope ends.
